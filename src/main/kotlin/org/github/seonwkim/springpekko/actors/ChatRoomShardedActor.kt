@@ -49,18 +49,18 @@ object ChatRoomShardedActor {
         return Behaviors.setup { context: ActorContext<Command> ->
             context.log.info("Chat room [$roomId] initialized")
 
-            val localChatRoomActorToUsers = mutableMapOf<ActorRef<NewMessage>, MutableList<String>>()
+            val chatRoomLocalActorsToUsers = mutableMapOf<ActorRef<NewMessage>, MutableList<String>>()
             val cluster = Cluster.get(context.system)
             val nodeAddress = cluster.selfMember().address()
 
             Behaviors.receiveMessage { command ->
                 when (command) {
                     is JoinRoom -> {
-                        val users = localChatRoomActorToUsers.getOrDefault(command.replyTo, mutableListOf())
+                        val users = chatRoomLocalActorsToUsers.getOrDefault(command.replyTo, mutableListOf())
                         users.add(command.user)
                         context.log.info("[$nodeAddress] User [${command.user}] joined ChatRoom [$roomId]")
-                        localChatRoomActorToUsers[command.replyTo] = users
-                        localChatRoomActorToUsers.forEach { (ref, _) ->
+                        chatRoomLocalActorsToUsers[command.replyTo] = users
+                        chatRoomLocalActorsToUsers.forEach { (ref, _) ->
                             ref.tell(
                                 NewMessage(
                                     roomId = roomId,
@@ -73,7 +73,7 @@ object ChatRoomShardedActor {
                     is SendMessage -> {
                         val address = context.self.path().toString()
                         val port = context.system.address().port().get()
-                        localChatRoomActorToUsers.forEach { (ref, _) ->
+                        chatRoomLocalActorsToUsers.forEach { (ref, _) ->
                             ref.tell(
                                 NewMessage(
                                     roomId = roomId,
@@ -87,7 +87,7 @@ object ChatRoomShardedActor {
                     }
 
                     is GetParticipantsRequest -> {
-                        val participants = localChatRoomActorToUsers.values.flatten().toList()
+                        val participants = chatRoomLocalActorsToUsers.values.flatten().toList()
                         command.replyTo.tell(GetParticipantsResponse(participants))
                     }
 

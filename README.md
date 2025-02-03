@@ -15,3 +15,11 @@ $ sh cluster-stop.sh
 $ cd frontend 
 $ npm start 
 ```
+
+## How it works 
+
+### Join
+![join.png](images/join.png)
+
+### Send 
+![send.png](images/send.png)
