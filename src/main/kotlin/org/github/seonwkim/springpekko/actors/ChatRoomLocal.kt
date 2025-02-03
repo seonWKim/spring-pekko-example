@@ -8,7 +8,7 @@ import org.github.seonwkim.springpekko.utils.ActorUtils
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import java.io.Serializable
 
-object ChatRoomLocal {
+object ChatRoomLocalActor {
 
     sealed interface Command : Serializable
 
@@ -27,8 +27,8 @@ object ChatRoomLocal {
     ): Behavior<Command> {
         return Behaviors.setup { context: ActorContext<Command> ->
 
-            val messageAdapter: ActorRef<ChatRoomSharded.NewMessage> =
-                context.messageAdapter(ChatRoomSharded.NewMessage::class.java) { ack ->
+            val messageAdapter: ActorRef<ChatRoomShardedActor.NewMessage> =
+                context.messageAdapter(ChatRoomShardedActor.NewMessage::class.java) { ack ->
                     NewMessageReceived(ack.roomId, ack.messages)
                 }
 
@@ -36,9 +36,9 @@ object ChatRoomLocal {
                 when (command) {
                     is JoinRoom -> {
                         context.log.info("Join received for user(${command.user}) to room(${command.roomId})")
-                        val chatRoom = ActorUtils.getShardedActor(ChatRoomSharded.entityTypeKey, command.roomId)
+                        val chatRoom = ActorUtils.getShardedActor(ChatRoomShardedActor.entityTypeKey, command.roomId)
                         chatRoom.tell(
-                            ChatRoomSharded.JoinRoom(
+                            ChatRoomShardedActor.JoinRoom(
                                 roomId = command.roomId,
                                 user = command.user,
                                 replyTo = messageAdapter

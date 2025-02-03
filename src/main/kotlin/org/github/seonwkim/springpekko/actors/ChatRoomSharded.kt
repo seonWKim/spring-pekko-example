@@ -9,7 +9,7 @@ import org.apache.pekko.cluster.sharding.typed.javadsl.EntityTypeKey
 import org.apache.pekko.cluster.typed.Cluster
 import java.io.Serializable
 
-object ChatRoomSharded {
+object ChatRoomShardedActor {
 
     val entityTypeKey: EntityTypeKey<Command> = EntityTypeKey.create(Command::class.java, "ChatRoom")
 
@@ -104,8 +104,8 @@ object ChatRoomSharded {
 
 }
 
-object ChatRoomMessageExtractor : ShardingMessageExtractor<ChatRoomSharded.Command, ChatRoomSharded.Command>() {
-    override fun entityId(message: ChatRoomSharded.Command): String {
+object ChatRoomMessageExtractor : ShardingMessageExtractor<ChatRoomShardedActor.Command, ChatRoomShardedActor.Command>() {
+    override fun entityId(message: ChatRoomShardedActor.Command): String {
         return message.roomId
     }
 
@@ -113,7 +113,7 @@ object ChatRoomMessageExtractor : ShardingMessageExtractor<ChatRoomSharded.Comma
         return (entityId.hashCode() % 100).toString()
     }
 
-    override fun unwrapMessage(message: ChatRoomSharded.Command): ChatRoomSharded.Command {
+    override fun unwrapMessage(message: ChatRoomShardedActor.Command): ChatRoomShardedActor.Command {
         return message
     }
 }

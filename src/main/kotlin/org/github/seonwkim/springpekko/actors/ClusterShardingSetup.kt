@@ -8,9 +8,9 @@ object ClusterShardingSetup {
     fun create(system: ActorSystem<*>) {
         val sharding = ClusterSharding.get(system)
         sharding.init(
-            Entity.of(ChatRoomSharded.entityTypeKey) { entityContext ->
+            Entity.of(ChatRoomShardedActor.entityTypeKey) { entityContext ->
                 // entityContext.entityId is used to create a unique instance of the ChatRoom actor for each shard
-                ChatRoomSharded.create(entityContext.entityId)
+                ChatRoomShardedActor.create(entityContext.entityId)
             }.withMessageExtractor(ChatRoomMessageExtractor)
         )
 
