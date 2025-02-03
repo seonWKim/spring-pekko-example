@@ -1,6 +1,8 @@
 # voyager-actor-template
 
 - Spring boot + pekko
+  - Spring for DI(dependency inversion) and web request handling 
+  - Pekko for clustering and sharding actors 
 
 ## How to start
 
